@@ -5,10 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-/**
- * Classe qui permet de créer physiquement la base de données SQL Lite sur le
- */
-
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private String name;
@@ -20,7 +16,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.name = name;
     }
 
-    // TODO : Création d'une table. CREATE TABLE waypoint ...
     @Override
     public void onCreate(SQLiteDatabase db) {
 

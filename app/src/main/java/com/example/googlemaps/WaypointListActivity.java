@@ -1,22 +1,27 @@
 package com.example.googlemaps;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.app.ListActivity;
 import android.database.Cursor;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
-import android.view.Menu;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 public class WaypointListActivity extends ListActivity {
 
     private DBAdapter dbAdapter;
     private String dbName;
 
-    private static final int MENU_ITEM_EDITER = 101;
+    private static final int MENU_ITEM_SUIVRE = 101;
     private static final int MENU_ITEM_SUPPRIMER = 102;
 
     @Override
@@ -31,7 +36,7 @@ public class WaypointListActivity extends ListActivity {
         // (sans implémenter le code).
 
         // Créer l'adapteur pour la BDD.
-        dbAdapter = new DBAdapter(this, dbName);
+        dbAdapter = DBAdapter.getInstance(this, dbName);
 
         // Ouvrir la BDD.
         dbAdapter.open();
@@ -42,11 +47,6 @@ public class WaypointListActivity extends ListActivity {
         registerForContextMenu(getListView());
     }
 
-    // mettre en place ce qu'il faut pour avoir un menu d'options permettant de tout effacer
-    // en BDD.
-
-    // ne pas oublier de surcharger la méthode onDestroy qui doit "faire écho"
-    // à la méthode onCreate.
     @Override
     protected void onDestroy() {
         dbAdapter.close();
@@ -59,17 +59,34 @@ public class WaypointListActivity extends ListActivity {
         menu.setHeaderTitle("Options element");
 
         // groupId, itemId, order, title
-        menu.add(0, MENU_ITEM_EDITER , 0, "Editer [bouton demo]");
-        menu.add(0, MENU_ITEM_SUPPRIMER , 1, "Supprimer [bouton demo]");
+        menu.add(0, MENU_ITEM_SUIVRE , 0, "Suivre");
+        menu.add(0, MENU_ITEM_SUPPRIMER , 1, "Supprimer");
 
         super.onCreateContextMenu(menu, view, menuInfo);
     }
 
-    // charger l'IHM avec le contenu de la base.
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId())
+        {
+            case MENU_ITEM_SUIVRE :
+                Intent intent = new Intent(this, MapsActivity.class);
+                intent.putExtra("waypointID", String.valueOf(info.id));
+                startActivity(intent);
+                break;
+
+            case MENU_ITEM_SUPPRIMER :
+
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
     public void dataBindWaypoint() {
 
         setContentView(R.layout.activity_waypoint_list);
-        Cursor cursor = dbAdapter.retrieveItemList();
+        Cursor cursor = dbAdapter.retrieveWaypointList();
         ListAdapter adapter = new SimpleCursorAdapter(
                 this,
                 R.layout.user_item,
@@ -81,21 +98,13 @@ public class WaypointListActivity extends ListActivity {
         setListAdapter(adapter);
     }
 
-    // Modifier l'IHM pour qu'elle comporte un bouton permettant de rajouter un élément en
-    // base de données (puis de rafraichir l'IHM).
-    // Un id unique doit être créé à chaque fois (par exemple basé sur le temps).
-    // cf. SystemClock.currentThreadTimeInMillis.
-
-    // C'est la fonction execute part le bouton ajouter waypoint, j'ai modifié son onClick dans
-    // le XML.
-    public void ajouterWaypoint(View view)
-    {
+    public void ajouterWaypoint(View view) {
         EditText id = (EditText) findViewById(R.id.idText);
         EditText libelle = (EditText) findViewById(R.id.libelleText);
         EditText latitude = (EditText) findViewById(R.id.latituideText);
         EditText longitude = (EditText) findViewById(R.id.longitudeText);
 
-        this.dbAdapter.insertItem(id.getText().toString(),
+        this.dbAdapter.insertWaypoint(id.getText().toString(),
                 libelle.getText().toString(),
                 latitude.getText().toString(),
                 longitude.getText().toString());

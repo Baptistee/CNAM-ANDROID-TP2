@@ -13,13 +13,27 @@ import android.database.sqlite.SQLiteDatabase;
 public class DBAdapter {
     private DatabaseHelper dbHelper;
     private Context context;
-    private SQLiteDatabase db; // Notre BDD.
-    private String name; // Nom de la BDD.
+    private SQLiteDatabase db;
+    private String name;
+    private static DBAdapter INSTANCE = null;
 
-    public DBAdapter(Context context, String name) {
+    private DBAdapter(Context context, String name) {
         this.context = context;
         this.name = name;
         dbHelper = new DatabaseHelper(this.context, this.name);
+    }
+
+    public static DBAdapter getInstance(Context context, String name) {
+
+        if (INSTANCE == null) {
+            INSTANCE = new DBAdapter(context, name);
+        }
+        return INSTANCE;
+    }
+
+    public static DBAdapter getInstance() {
+
+        return INSTANCE;
     }
 
     public DBAdapter open() {
@@ -35,8 +49,7 @@ public class DBAdapter {
         db.execSQL("DROP TABLE IF EXISTS waypoint");
     }
 
-    // Les paramètres sont les champs d'un element à insérer dans la table.
-    public long insertItem(String pId, String pLibelle, String pLatitude, String pLongitude) {
+    public long insertWaypoint(String pId, String pLibelle, String pLatitude, String pLongitude) {
 
         // Créer la requête d'insertion d'un élément dans la table.
 
@@ -51,17 +64,45 @@ public class DBAdapter {
 
     // l'id est la clé primaire de l'élément à supprimer de la table.
     // gérer le retour en boolean et plus en void.
-    public void removeItem(String pId) {
+    public void removeWaypoint(String pId) {
 
         String[] id = {pId};
 
         this.db.delete("waypoint", "id", id);
     }
 
-    // Retourne la liste complète des éléments de la table.
-    public Cursor retrieveItemList() {
+    public Cursor retrieveWaypointList() {
         // utiliser la méthode db.query pour retourner cette liste.
 
         return this.db.query("waypoint", null, null, null, null, null, null);
+    }
+
+    public boolean deleteWaypoint(String pId) {
+        db.execSQL("");
+        return true;
+    }
+
+    public String getWaypointNameByID(int pId) {
+
+        Cursor c = this.db.query("waypoint", new String[] { "_libelle" }, "_id = ?", new String[] { String.valueOf(pId) }, null, null, null);
+        c.moveToFirst();
+
+        return c.getString(0);
+    }
+
+    public float getWaypointLatByID (int pId) {
+
+        Cursor c = this.db.query("waypoint", new String[] { "_latitude" }, "_id = ?", new String[] { String.valueOf(pId) }, null, null, null);
+        c.moveToFirst();
+
+         return c.getFloat(0);
+    }
+
+    public float getWaypointLonByID (int pId) {
+
+        Cursor c = this.db.query("waypoint", new String[] { "_longitude" }, "_id = ?", new String[] { String.valueOf(pId) }, null, null, null);
+        c.moveToFirst();
+
+        return c.getFloat(0);
     }
 }
