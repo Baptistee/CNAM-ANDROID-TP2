@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center">Un projet <a href="" target="_blank">Android TP</a>.</h4>
+<h4 align="center">Un projet <a href="" target="_blank">Android</a>.</h4>
 
 <p align="center">
   <a href="">
