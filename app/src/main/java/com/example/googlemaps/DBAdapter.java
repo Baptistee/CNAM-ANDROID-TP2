@@ -32,7 +32,6 @@ public class DBAdapter {
     }
 
     public static DBAdapter getInstance() {
-
         return INSTANCE;
     }
 
@@ -78,7 +77,9 @@ public class DBAdapter {
     }
 
     public boolean deleteWaypoint(String pId) {
-        db.execSQL("");
+
+        db.execSQL("DELETE FROM waypoint WHERE _id = '" + pId + "'");
+
         return true;
     }
 

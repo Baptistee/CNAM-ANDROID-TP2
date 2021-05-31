@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import android.app.ListActivity;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -71,13 +72,15 @@ public class WaypointListActivity extends ListActivity {
         switch (item.getItemId())
         {
             case MENU_ITEM_SUIVRE :
-                Intent intent = new Intent(this, MapsActivity.class);
-                intent.putExtra("waypointID", String.valueOf(info.id));
-                startActivity(intent);
+                Intent intent1 = new Intent(this, MapsActivity.class);
+                intent1.putExtra("waypointID", String.valueOf(info.id));
+                startActivity(intent1);
                 break;
 
             case MENU_ITEM_SUPPRIMER :
-
+                Intent intent2 = new Intent(this, WaypointListActivity.class);
+                supprimer(info);
+                startActivity(intent2);
                 break;
         }
         return super.onContextItemSelected(item);
@@ -110,5 +113,9 @@ public class WaypointListActivity extends ListActivity {
                 longitude.getText().toString());
 
         dataBindWaypoint();
+    }
+
+    public void supprimer(AdapterView.AdapterContextMenuInfo info) {
+        this.dbAdapter.deleteWaypoint(String.valueOf(info.id));
     }
 }
